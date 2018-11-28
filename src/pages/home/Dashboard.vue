@@ -16,11 +16,32 @@
         </marquee>
       </cell>
     </group>
+
+    <group>
+      <selector 
+        title="账号" 
+        v-model="accountSelect"
+        placeholder = "请选择账号"
+        @on-change = "selectAccount"
+        :options="accounts"></selector>
+       <cell title="值" :value="testValue"></cell>
+    </group>
+
+    <group>
+      <div class="lsiten-button-cell">
+        <x-button type="primary" @click.native="addTestValue">加1</x-button>
+      </div>
+      <div class="lsiten-button-cell">
+        <x-button type="primary" @click.native="getTestValue">获取值</x-button>
+      </div>
+    </group>
   </div>
 </template>
 
 <script>
-import { Radio, Group, Swiper, SwiperItem, Cell, Marquee, MarqueeItem } from 'vux'
+import { Radio, Group, Swiper, SwiperItem, Cell, Selector, XButton, Marquee, MarqueeItem } from 'vux'
+import { mapGetters } from 'vuex'
+import Lsiten from '../../../build/contracts/Lsiten.json'
 
 const baseList = [{
   url: 'javascript:',
@@ -44,7 +65,9 @@ export default {
     Swiper,
     Marquee,
     MarqueeItem,
-    Cell
+    Cell,
+    XButton,
+    Selector
   },
   data () {
     return {
@@ -60,11 +83,24 @@ export default {
         {
           title: '测试3'
         }
-      ]
+      ],
+      accounts: [],
+      accountSelect: '',
+      currentContract: null,
+      testValue: ''
     }
+  },
+  computed: {
+    ...mapGetters({
+      web3: 'web3_get_instance'
+    })
   },
   created () {
     this.$vux.bus && this.$vux.bus.$on('vux:after-view-enter', this.init)
+    this.web3Instance = this.web3()
+    this.web3Instance.eth.getAccounts().then(accounts => {
+      this.accounts = accounts
+    })
   },
   destroyed () {
     this.$vux.bus && this.$vux.bus.$off('vux:after-view-enter', this.init)
@@ -74,12 +110,52 @@ export default {
       console.log(1)
     },
     onFocusIndexChange: function (lang) {
+    },
+    selectAccount (val) {
+      // const abi = Lsiten.abi
+      this.currentContract = new this.web3Instance.eth.Contract(Lsiten.abi, val)
+    },
+    addTestValue () {
+      this.$store.dispatch('com_set_loading_status', true)
+      this.currentContract.methods.addTestId().send({
+        from: this.currentContract.options.address
+      })
+      .then(result => {
+        this.$store.dispatch('com_set_loading_status', false)
+        if (result.status) {
+          // 显示文字
+          this.$vux.toast.text('操作成功！', 'middle')
+        } else {
+          this.$vux.toast.text('操作失败！', 'middle')
+        }
+      })
+      .catch(resultErr => {
+        this.$store.dispatch('com_set_loading_status', false)
+        this.$vux.toast.text('操作失败！', 'middle')
+      })
+    },
+    getTestValue () {
+      this.$store.dispatch('com_set_loading_status', true)
+      this.currentContract.methods.lsitenGetTestId().call({
+        from: this.currentContract.options.address
+      })
+      .then((result) => {
+        this.$store.dispatch('com_set_loading_status', false)
+        this.testValue = result[0] || result
+      }).catch(resultErr => {
+        console.log(resultErr)
+        this.$store.dispatch('com_set_loading_status', false)
+        this.$vux.toast.text('操作失败！', 'middle')
+      })
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.lsiten-button-cell {
+  padding: 5px 10px;
+}
 .swiper-demo-img img {
   width: 100%;
 }

@@ -10,7 +10,6 @@ import vuxLocales from './locales/all.js'
 import { sync } from 'vuex-router-sync'
 import { Group, Cell, DatetimePlugin, CloseDialogsPlugin, ConfigPlugin, BusPlugin, LocalePlugin, DevicePlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, LoadingPlugin, WechatPlugin, AjaxPlugin } from 'vux'
 import * as types from './vuex/types/com'
-import monitorWeb3 from './web3/monitorWeb3'
 
 Vue.config.productionTip = false
 
@@ -33,9 +32,12 @@ Vue.use(LocalePlugin)
 const nowLocale = Vue.locale.get()
 if (/zh/.test(nowLocale)) {
   Vue.i18n.set('zh-CN')
+  store.commit(types.COM_SYS_LOCALE, 'zh-CN')
 } else {
   Vue.i18n.set('en')
+  store.commit(types.COM_SYS_LOCALE, 'en')
 }
+
 // global VUX config
 Vue.use(ConfigPlugin, {
   $layout: 'VIEW_BOX' // global config for VUX, since v2.5.12
@@ -147,20 +149,7 @@ new Vue({
   router,
   store,
   render: h => h(App),
-  beforeCreate: function () {
+  beforeCreate () {
     this.$store.dispatch('web3_init_network_status')
-    .then(result => {
-      let state = result.state
-      monitorWeb3(state)
-    })
-    .catch((result = {}) => {
-      let state = result.state
-      this.forcedIsValidUserBut = '0'
-      monitorWeb3(state)
-      if (!(this.isDAppReady)) {
-        this.$store.dispatch('web3_update_dapp_status', true)
-      }
-      console.error(result, 'Unable to REGISTER_WEB3_INSTANCE')
-    })
   }
 }).$mount('#app-box')

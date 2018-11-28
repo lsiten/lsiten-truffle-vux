@@ -9,7 +9,7 @@
       style="width:100%;position:absolute;left:0;top:0;z-index:100;"
       :left-options="leftOptions"
       :right-options="rightOptions"
-      :title="$t(title)"
+      :title="titleValue"
       @on-click-more="onClickMore">
       <span v-if="overLeftShow" slot="overwrite-left" @click="onLeftOverClick">
         <x-icon type="navicon" size="35" style="fill:#fff;position:relative;top:-8px;left:-3px;"></x-icon>
@@ -44,7 +44,8 @@ export default {
   },
   data () {
     return {
-      menus: {}
+      menus: {},
+      titleValue: ''
     }
   },
   created () {
@@ -54,16 +55,17 @@ export default {
     changeLocale (locale) {
       this.$i18n.set(locale)
       this.$locale.set(locale)
+      this.$store.dispatch('com_set_locale', locale)
       this.initLangMenu()
     },
     initLangMenu: function () {
       let lang = this.$locale.get()
-      console.log(this)
       this.menus = {
         'language.noop': '<span class="menu-title">' + this.$t('components.header.language.title') + '</span>',
         'zh-CN': this.$t('components.header.language.zh-CN') + (lang === 'zh-CN' ? '<span class="iconfont icon-dui" style="position:absolute;right: 12px;top: 12px;color: #09BE7F;"></span>' : ''),
         'en': this.$t('components.header.language.en') + (lang === 'en' ? '<span class="iconfont icon-dui"  style="position:absolute;right: 12px;top: 12px;color: #09BE7F;"></span>' : '')
       }
+      this.titleValue = this.$t(this.title)
     },
     closeAction: function () {
       this.$store.dispatch('com_change_show_menu', false)

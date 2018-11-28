@@ -24,7 +24,9 @@ module.exports = {
     "development": {
       network_id: 1,        // Official Ethereum test network
       host: "127.0.0.1", // Random IP for example purposes (do not use)
-      port: 8800
+      port: 8800,
+      gas: 4500000,
+      gasPrice: 20000000000
     }
   },
   build: "npm run start"

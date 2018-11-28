@@ -20,6 +20,9 @@ const state = {
   // footer show
   footerConfig: {
     isShowBar: true
+  },
+  sys: {
+    locale: 'zh-CN'
   }
 }
 
@@ -34,7 +37,8 @@ const getters = {
   com_nav_overLeftShow: state => state.headerConfig.overLeftShow,
   com_nav_onLeftOverClick: state => state.headerConfig.onLeftOverClick,
   com_nav_showmenu: state => state.headerConfig.showMenu,
-  com_bar_isshow: state => state.footerConfig.isShowBar
+  com_bar_isshow: state => state.footerConfig.isShowBar,
+  com_sys_locale: state => state.sys.locale
 }
 
 const mutations = {
@@ -81,6 +85,10 @@ const mutations = {
   // 更改header显示状态
   [types.COM_BAR_SHOW] (state, status) {
     state.footerConfig.isShowBar = status
+  },
+  // 更改系统语言
+  [types.COM_SYS_LOCALE] (state, value) {
+    state.sys.locale = value
   }
 }
 
@@ -109,6 +117,10 @@ const actions = {
   // 设置菜单项
   com_change_show_menu ({ commit }, status) {
     commit(types.COM_NAV_SHOWMENU, status)
+  },
+  // 设置语言
+  com_set_locale ({ commit }, value) {
+    commit(types.COM_SYS_LOCALE, value)
   }
 }
 
