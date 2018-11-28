@@ -116,6 +116,10 @@ export default {
       this.currentContract = new this.web3Instance.eth.Contract(Lsiten.abi, val)
     },
     addTestValue () {
+      if (!this.currentContract || !this.accountSelect) {
+        this.$vux.toast.text('请选择账号！', 'middle')
+        return
+      }
       this.$store.dispatch('com_set_loading_status', true)
       this.currentContract.methods.addTestId().send({
         from: this.currentContract.options.address
@@ -135,6 +139,10 @@ export default {
       })
     },
     getTestValue () {
+      if (!this.currentContract || !this.accountSelect) {
+        this.$vux.toast.text('请选择账号！', 'middle')
+        return
+      }
       this.$store.dispatch('com_set_loading_status', true)
       this.currentContract.methods.lsitenGetTestId().call({
         from: this.currentContract.options.address
